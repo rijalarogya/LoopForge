@@ -11,21 +11,31 @@ endings, overlays, export settings, progress, and render logs.
 
 ## Download
 
-The first notarized release will be published on the
-[GitHub Releases](https://github.com/rijalarogya/LoopForge/releases) page after the
-Developer ID enrollment is complete.
+Download the latest **unsigned early tester build** from the
+[GitHub Releases](https://github.com/rijalarogya/LoopForge/releases) page.
 
 Version 1.0.0 supports Apple-silicon Macs running macOS 13 or newer. FFmpeg and
 ffprobe are included, so end users do not need Homebrew.
 
+## Install the unsigned build
+
+1. Download the ZIP or DMG from GitHub Releases.
+2. Move LoopForge to Applications.
+3. In Applications, right-click LoopForge and choose **Open**.
+4. If macOS still blocks it, open **System Settings > Privacy & Security**,
+   find the LoopForge security message, and click **Open Anyway**.
+
+This early tester build is unsigned, so macOS displays an unidentified
+developer warning. Only download LoopForge from this repository's Releases
+page and verify the published SHA-256 checksum when possible.
+
 ## First run
 
-1. Drag LoopForge to Applications and open it.
-2. Choose OpenAI-Compatible or OpenRouter and enter your own API key, or run
+1. Choose OpenAI-Compatible or OpenRouter and enter your own API key, or run
    Ollama locally.
-3. Add video, audio, or image files.
-4. Describe the result using `@filename` references.
-5. Review the deterministic render plan and start rendering.
+2. Add video, audio, or image files.
+3. Describe the result using `@filename` references.
+4. Review the deterministic render plan and start rendering.
 
 LoopForge does not provide a hosted AI service. See [PRIVACY.md](PRIVACY.md).
 
@@ -44,7 +54,16 @@ archives. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Release
 
-Set a valid Developer ID identity and build the release:
+Build the free unsigned early tester release:
+
+```sh
+./scripts/package-unsigned-release.sh
+```
+
+This produces clearly labeled unsigned ZIP and DMG downloads in
+`dist/release-1.0.0-unsigned`.
+
+The future Developer ID release path remains available:
 
 ```sh
 export LOOPFORGE_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
@@ -59,8 +78,8 @@ export LOOPFORGE_NOTARY_PROFILE="LoopForgeNotary"
 ./scripts/notarize.sh
 ```
 
-The release directory includes the DMG, checksums, third-party notices, and
-corresponding FFmpeg/x264 source archives. See
+Release directories include checksums, third-party notices, and corresponding
+FFmpeg/x264 source archives. See
 [`docs/RELEASING.md`](docs/RELEASING.md) for the complete checklist.
 
 ## Safety model

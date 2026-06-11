@@ -8,6 +8,7 @@ BUILD_DIR="$ROOT/dist"
 APP_DIR="$BUILD_DIR/$APP_NAME.app"
 TOOLS_DIR="${LOOPFORGE_TOOLS_DIR:-$ROOT/Vendor/ffmpeg/arm64/bin}"
 SIGNING_IDENTITY="${LOOPFORGE_SIGNING_IDENTITY:--}"
+SIGNING_MODE="${LOOPFORGE_SIGNING_MODE:-adhoc}"
 
 if [[ "$(uname -m)" != "arm64" ]]; then
     echo "LoopForge 1.0.0 release builds currently support Apple silicon only." >&2
@@ -48,19 +49,39 @@ chmod +x \
     "$APP_DIR/Contents/Resources/bin/ffmpeg" \
     "$APP_DIR/Contents/Resources/bin/ffprobe"
 
-sign_item() {
-    local item="$1"
-    if [[ "$SIGNING_IDENTITY" == "-" ]]; then
-        codesign --force --options runtime --sign - "$item"
-    else
+case "$SIGNING_MODE" in
+    unsigned)
+        echo "Building unsigned early-tester app with an ad-hoc bundle seal."
+        codesign --force --sign - "$APP_DIR/Contents/Resources/bin/ffmpeg"
+        codesign --force --sign - "$APP_DIR/Contents/Resources/bin/ffprobe"
+        codesign --force --sign - "$APP_DIR"
+        codesign --verify --deep --strict --verbose=2 "$APP_DIR"
+        ;;
+    adhoc)
+        codesign --force --options runtime --sign - \
+            "$APP_DIR/Contents/Resources/bin/ffmpeg"
+        codesign --force --options runtime --sign - \
+            "$APP_DIR/Contents/Resources/bin/ffprobe"
+        codesign --force --options runtime --sign - "$APP_DIR"
+        codesign --verify --deep --strict --verbose=2 "$APP_DIR"
+        ;;
+    developer-id)
+        if [[ "$SIGNING_IDENTITY" == "-" || -z "$SIGNING_IDENTITY" ]]; then
+            echo "Set LOOPFORGE_SIGNING_IDENTITY for a Developer ID build." >&2
+            exit 1
+        fi
         codesign --force --options runtime --timestamp \
-            --sign "$SIGNING_IDENTITY" "$item"
-    fi
-}
-
-sign_item "$APP_DIR/Contents/Resources/bin/ffmpeg"
-sign_item "$APP_DIR/Contents/Resources/bin/ffprobe"
-sign_item "$APP_DIR"
-codesign --verify --deep --strict --verbose=2 "$APP_DIR"
+            --sign "$SIGNING_IDENTITY" "$APP_DIR/Contents/Resources/bin/ffmpeg"
+        codesign --force --options runtime --timestamp \
+            --sign "$SIGNING_IDENTITY" "$APP_DIR/Contents/Resources/bin/ffprobe"
+        codesign --force --options runtime --timestamp \
+            --sign "$SIGNING_IDENTITY" "$APP_DIR"
+        codesign --verify --deep --strict --verbose=2 "$APP_DIR"
+        ;;
+    *)
+        echo "Unknown LOOPFORGE_SIGNING_MODE: $SIGNING_MODE" >&2
+        exit 1
+        ;;
+esac
 
 echo "$APP_DIR"

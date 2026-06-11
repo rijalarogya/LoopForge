@@ -6,7 +6,13 @@ VERSION="${LOOPFORGE_VERSION:-1.0.0}"
 TOOLS_DIR="${LOOPFORGE_TOOLS_DIR:-$ROOT/Vendor/ffmpeg/arm64}"
 RELEASE_DIR="$ROOT/dist/release-$VERSION"
 
-"$ROOT/scripts/build-app.sh"
+if [[ -z "${LOOPFORGE_SIGNING_IDENTITY:-}" ]]; then
+    echo "Set LOOPFORGE_SIGNING_IDENTITY for the notarized release path." >&2
+    echo "For a free unsigned build, run ./scripts/package-unsigned-release.sh." >&2
+    exit 1
+fi
+
+LOOPFORGE_SIGNING_MODE=developer-id "$ROOT/scripts/build-app.sh"
 "$ROOT/scripts/create-dmg.sh"
 
 rm -rf "$RELEASE_DIR"
