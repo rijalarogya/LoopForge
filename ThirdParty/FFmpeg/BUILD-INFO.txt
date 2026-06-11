@@ -1,0 +1,16 @@
+LoopForge 1.0.0 bundled media tools
+
+FFmpeg version: 8.1.1
+FFmpeg source: https://ffmpeg.org/releases/ffmpeg-8.1.1.tar.xz
+FFmpeg SHA-256: b6863adde98898f42602017462871b5f6333e65aec803fdd7a6308639c52edf3
+
+x264 commit: b35605ace3ddf7c1a5d67a2eb553f034aef41d55
+x264 source:
+https://code.videolan.org/videolan/x264/-/archive/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/x264-b35605ace3ddf7c1a5d67a2eb553f034aef41d55.tar.gz
+x264 SHA-256: cd71a7515b0e9a012e1ac9b1f8415bebcaf6fc97d4db32286642ac4c0fbe24f9
+
+Target: arm64-apple-macos13.0
+License mode: GPL v3 or later because libx264 is enabled.
+
+The exact build commands are maintained in scripts/build-ffmpeg.sh. Corresponding
+source archives and binary checksums are included with every LoopForge release.
